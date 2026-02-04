@@ -174,15 +174,108 @@
       font-size: 0.875rem;
     }
     
-    .accordion-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease-out;
+    /* Star Rating */
+    .star {
+      font-size: 1.25rem;
+      cursor: pointer;
+      color: #cbd5e1;
+      transition: all 0.2s;
     }
     
-    .accordion-content.open {
-      max-height: 1000px;
+    .star.active {
+      color: #facc15;
+      text-shadow: 0 0 8px rgba(250, 204, 21, 0.3);
     }
+    
+    .star:hover {
+      transform: scale(1.2);
+    }
+    
+    .rating-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .rating-badge.rating-5 { background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(21, 128, 61, 0.2)); color: #16a34a; border: 1px solid rgba(34, 197, 94, 0.3); }
+    .rating-badge.rating-4 { background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(21, 128, 61, 0.15)); color: #16a34a; border: 1px solid rgba(34, 197, 94, 0.2); }
+    .rating-badge.rating-3 { background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(180, 83, 9, 0.15)); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.2); }
+    .rating-badge.rating-2 { background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(185, 28, 28, 0.15)); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.2); }
+    .rating-badge.rating-1 { background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(185, 28, 28, 0.15)); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.2); }
+    
+    /* Modal Penilaian */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 1rem;
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      animation: slideUp 0.3s ease;
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .comment-item {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 1rem 0;
+    }
+    
+    .comment-item:last-child {
+      border-bottom: none;
+    }
+    
+    /* Leaderboard */
+    .leaderboard-item {
+      transition: all 0.3s ease;
+    }
+    
+    .leaderboard-item:hover {
+      transform: translateX(4px);
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+    }
+    
+    .rank-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.875rem;
+    }
+    
+    .rank-1 { background: linear-gradient(135deg, #facc15, #eab308); color: white; }
+    .rank-2 { background: linear-gradient(135deg, #94a3b8, #64748b); color: white; }
+    .rank-3 { background: linear-gradient(135deg, #f97316, #ea580c); color: white; }
+    .rank-other { background: #f1f5f9; color: #64748b; }
     
     @media (max-width: 768px) {
       .prosedur-step {
@@ -217,17 +310,29 @@
             <span class="text-sm font-medium text-blue-600">Library Mode</span>
           </div>
           
-          <!-- Tombol Tambah Karya -->
-          <button 
-            id="tambah-karya-btn" 
-            class="add-btn px-6 py-3 rounded-full flex items-center gap-2"
-            onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8_YVZdP0rNNu0h5C9eVD4qB7HJATYReHaAeHZ-V6BCHpoBw/viewform', '_blank')"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            Tambah Karya Baru
-          </button>
+          <!-- Tombol Tambah Karya & Penilaian -->
+          <div class="flex gap-3">
+            <button 
+              id="penilaian-btn" 
+              class="px-6 py-3 rounded-full flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold transition-all shadow-md hover:shadow-lg"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+              </svg>
+              Beri Penilaian
+            </button>
+            
+            <button 
+              id="tambah-karya-btn" 
+              class="add-btn px-6 py-3 rounded-full flex items-center gap-2"
+              onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8_YVZdP0rNNu0h5C9eVD4qB7HJATYReHaAeHZ-V6BCHpoBw/viewform', '_blank')"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Tambah Karya Baru
+            </button>
+          </div>
         </div>
         
         <h1 id="gallery-title" class="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
@@ -235,10 +340,32 @@
         </h1>
         
         <p id="subtitle-text" class="text-lg text-gray-600 max-w-2xl mx-auto">
-          Mata Pelajaran Sosiologi
+          Mata Pelajaran Sosiologi • Sistem Penilaian Terintegrasi
         </p>
       </div>
     </header>
+    
+    <!-- Leaderboard Section -->
+    <section class="px-6 py-6 max-w-7xl mx-auto">
+      <div class="glass-effect rounded-2xl p-6 mb-6">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">🏆</span>
+            <h2 class="text-2xl font-bold text-gray-800">Leaderboard Rating Tertinggi</h2>
+          </div>
+          <span class="text-sm text-gray-500" id="leaderboard-update-time"></span>
+        </div>
+        
+        <div id="leaderboard-container">
+          <!-- Loading skeleton -->
+          <div class="space-y-3">
+            <div class="shimmer h-16 rounded-xl"></div>
+            <div class="shimmer h-16 rounded-xl"></div>
+            <div class="shimmer h-16 rounded-xl"></div>
+          </div>
+        </div>
+      </div>
+    </section>
     
     <!-- Prosedur Tugas Section -->
     <section class="px-6 py-8 max-w-7xl mx-auto">
@@ -615,19 +742,41 @@
               <span class="text-gray-600">Ditampilkan:</span>
               <span id="filtered-count" class="font-bold text-purple-600">0</span>
             </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xl text-amber-500">⭐</span>
+              <span class="text-gray-600">Total Penilaian:</span>
+              <span id="total-ratings" class="font-bold text-amber-600">0</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xl text-green-500">🏆</span>
+              <span class="text-gray-600">Top Rating:</span>
+              <span id="top-rating" class="font-bold text-green-600">0.0</span>
+            </div>
           </div>
           
           <!-- Tombol Tambah Karya (Mobile) -->
-          <button 
-            id="tambah-karya-btn-mobile" 
-            class="add-btn px-4 py-2 rounded-full flex items-center gap-2 md:hidden"
-            onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8_YVZdP0rNNu0h5C9eVD4qB7HJATYReHaAeHZ-V6BCHpoBw/viewform', '_blank')"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            Tambah Karya
-          </button>
+          <div class="flex gap-2">
+            <button 
+              id="penilaian-btn-mobile" 
+              class="px-4 py-2 rounded-full flex items-center gap-2 md:hidden bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+              </svg>
+              Nilai
+            </button>
+            
+            <button 
+              id="tambah-karya-btn-mobile" 
+              class="add-btn px-4 py-2 rounded-full flex items-center gap-2 md:hidden"
+              onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8_YVZdP0rNNu0h5C9eVD4qB7HJATYReHaAeHZ-V6BCHpoBw/viewform', '_blank')"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Tambah Karya
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -665,20 +814,29 @@
           <p class="text-gray-500 text-sm">
             © 2024 Library Karya Backend • Dibuat dengan ❤️ untuk pembelajaran
           </p>
-          <button 
-            class="px-5 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-50 to-purple-50 text-blue-600 hover:bg-blue-100 transition-colors border border-blue-200"
-            onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8_YVZdP0rNNu0h5C9eVD4qB7HJATYReHaAeHZ-V6BCHpoBw/viewform', '_blank')"
-          >
-            ✨ Tambah Karya Baru
-          </button>
+          <div class="flex gap-2">
+            <button 
+              id="penilaian-btn-footer" 
+              class="px-5 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 hover:bg-amber-100 transition-colors border border-amber-200"
+            >
+              ⭐ Beri Penilaian
+            </button>
+            
+            <button 
+              class="px-5 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-50 to-purple-50 text-blue-600 hover:bg-blue-100 transition-colors border border-blue-200"
+              onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8_YVZdP0rNNu0h5C9eVD4qB7HJATYReHaAeHZ-V6BCHpoBw/viewform', '_blank')"
+            >
+              ✨ Tambah Karya Baru
+            </button>
+          </div>
         </div>
       </div>
     </footer>
   </div>
   
   <!-- Modal Preview -->
-  <div id="modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-    <div class="relative w-full max-w-5xl max-h-[90%] bg-white rounded-2xl overflow-hidden shadow-2xl">
+  <div id="modal" class="modal-overlay">
+    <div class="modal-content">
       <div class="flex items-center justify-between p-4 border-b border-gray-200">
         <div>
           <h3 id="modal-title" class="font-bold text-lg text-gray-800"></h3>
@@ -703,6 +861,159 @@
     </div>
   </div>
 
+  <!-- Modal Penilaian -->
+  <div id="modal-penilaian" class="modal-overlay">
+    <div class="modal-content">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <span class="text-amber-500">⭐</span>
+            Beri Penilaian Karya
+          </h2>
+          <button id="close-penilaian-modal" class="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <form id="form-penilaian" class="space-y-6">
+          <!-- Nama Siswa -->
+          <div>
+            <label class="block font-semibold text-gray-700 mb-2">
+              Nama Siswa <span class="text-red-500">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="penilaian-nama" 
+              required
+              class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Pilih siswa dari daftar atau ketik nama"
+              list="nama-options"
+            >
+            <datalist id="nama-options">
+              <!-- Options will be populated by JavaScript -->
+            </datalist>
+          </div>
+          
+          <!-- Rating Bintang -->
+          <div>
+            <label class="block font-semibold text-gray-700 mb-3">
+              Berikan Nilai (Bintang) <span class="text-red-500">*</span>
+            </label>
+            <div class="flex gap-1 mb-2">
+              <span class="star" data-value="1">★</span>
+              <span class="star" data-value="2">★</span>
+              <span class="star" data-value="3">★</span>
+              <span class="star" data-value="4">★</span>
+              <span class="star" data-value="5">★</span>
+            </div>
+            <input type="hidden" id="penilaian-nilai" required>
+            <div id="rating-labels" class="flex justify-between text-sm text-gray-500 mt-1">
+              <span>Buruk</span>
+              <span>Cukup</span>
+              <span>Baik</span>
+              <span>Sangat Baik</span>
+              <span>Luar Biasa</span>
+            </div>
+            <p id="error-nilai" class="text-sm text-red-500 mt-2 hidden">
+              Silakan pilih nilai bintang
+            </p>
+          </div>
+          
+          <!-- Komentar -->
+          <div>
+            <label class="block font-semibold text-gray-700 mb-2">
+              Komentar (opsional)
+            </label>
+            <textarea 
+              id="penilaian-komentar" 
+              rows="4"
+              class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Berikan komentar atau masukan konstruktif..."
+            ></textarea>
+          </div>
+          
+          <!-- Button Submit -->
+          <button 
+            type="submit"
+            class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg"
+          >
+            Kirim Penilaian
+          </button>
+          
+          <p id="status-penilaian" class="text-center text-sm mt-2"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Detail Penilaian -->
+  <div id="modal-detail-penilaian" class="modal-overlay">
+    <div class="modal-content">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 id="detail-title" class="text-2xl font-bold text-gray-800"></h2>
+            <p id="detail-subtitle" class="text-sm text-gray-600 mt-1"></p>
+          </div>
+          <button id="close-detail-modal" class="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Ringkasan Rating -->
+        <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl mb-6 border border-blue-100">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="text-center">
+              <div class="text-3xl font-bold text-blue-600" id="avg-rating">0.0</div>
+              <div class="text-sm text-gray-600 mt-1">Rata-rata</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-purple-600" id="total-rating-count">0</div>
+              <div class="text-sm text-gray-600 mt-1">Total Penilaian</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-green-600" id="total-comments">0</div>
+              <div class="text-sm text-gray-600 mt-1">Komentar</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-amber-600" id="star-distribution">5★</div>
+              <div class="text-sm text-gray-600 mt-1">Rating Teratas</div>
+            </div>
+          </div>
+          
+          <!-- Distribusi Bintang -->
+          <div class="mt-6">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-sm font-medium text-gray-700">Distribusi Bintang</span>
+              <span class="text-sm text-gray-500" id="distribution-count">0 penilaian</span>
+            </div>
+            <div id="star-distribution-bars" class="space-y-2">
+              <!-- Will be populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+        
+        <!-- Daftar Komentar -->
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+            </svg>
+            Komentar & Ulasan
+          </h3>
+          
+          <div id="comments-list" class="space-y-4 max-h-96 overflow-y-auto pr-2">
+            <!-- Comments will be loaded here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Default configuration
     const defaultConfig = {
@@ -718,29 +1029,335 @@
     let config = { ...defaultConfig };
     let allData = [];
     let filteredData = [];
+    let allRatings = [];
+    let ratingStats = {};
     let currentKelasFilter = 'all';
     let currentTahunFilter = 'all';
+    let selectedKaryaForRating = null;
+    let leaderboardData = [];
 
-    // Google Sheets data
+    // Google Sheets URLs
     const SHEET_ID = '1DZSdEe6mgS8jOc4Q_pxPIrIjuAKrdqb0sZL2eUJflWs';
     const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
-    // Toggle Prosedur untuk mobile
-    document.getElementById('toggle-prosedur').addEventListener('click', function() {
-      const content = document.getElementById('prosedur-content');
-      const icon = document.getElementById('toggle-icon');
-      
-      content.classList.toggle('mobile-collapse');
-      if (content.classList.contains('mobile-collapse')) {
-        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>';
-      } else {
-        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>';
-      }
+    // Google Apps Script for ratings
+    const RATINGS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby9swSk3ZxEt1N-XT8Stf44cIL2e_0aXHy_wh5tLLlENi0LqiO_TGXXKE5HkR1dxiWfEg/exec';
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      setupEventListeners();
+      fetchData();
     });
+
+    // Setup all event listeners
+    function setupEventListeners() {
+      // Toggle Prosedur untuk mobile
+      document.getElementById('toggle-prosedur').addEventListener('click', function() {
+        const content = document.getElementById('prosedur-content');
+        const icon = document.getElementById('toggle-icon');
+        
+        content.classList.toggle('mobile-collapse');
+        if (content.classList.contains('mobile-collapse')) {
+          icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>';
+        } else {
+          icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>';
+        }
+      });
+
+      // Setup tombol penilaian
+      document.getElementById('penilaian-btn').addEventListener('click', () => openPenilaianModal());
+      document.getElementById('penilaian-btn-mobile').addEventListener('click', () => openPenilaianModal());
+      document.getElementById('penilaian-btn-footer').addEventListener('click', () => openPenilaianModal());
+      
+      // Setup modal penilaian
+      document.getElementById('close-penilaian-modal').addEventListener('click', () => closePenilaianModal());
+      document.getElementById('modal-penilaian').addEventListener('click', (e) => {
+        if (e.target.id === 'modal-penilaian') closePenilaianModal();
+      });
+      
+      // Setup modal detail penilaian
+      document.getElementById('close-detail-modal').addEventListener('click', () => closeDetailModal());
+      document.getElementById('modal-detail-penilaian').addEventListener('click', (e) => {
+        if (e.target.id === 'modal-detail-penilaian') closeDetailModal();
+      });
+
+      // Setup star rating in penilaian modal
+      const stars = document.querySelectorAll('#modal-penilaian .star');
+      stars.forEach(star => {
+        star.addEventListener('click', () => {
+          const value = star.dataset.value;
+          document.getElementById('penilaian-nilai').value = value;
+          
+          stars.forEach(s => s.classList.remove('active'));
+          for (let i = 0; i < value; i++) {
+            stars[i].classList.add('active');
+          }
+          
+          document.getElementById('error-nilai').classList.add('hidden');
+        });
+      });
+
+      // Setup form penilaian
+      document.getElementById('form-penilaian').addEventListener('submit', handlePenilaianSubmit);
+
+      // Setup modal preview
+      document.getElementById('close-modal').addEventListener('click', () => closeModal());
+      document.getElementById('modal').addEventListener('click', (e) => {
+        if (e.target.id === 'modal') closeModal();
+      });
+    }
+
+    // Handle penilaian form submission
+    async function handlePenilaianSubmit(e) {
+      e.preventDefault();
+      
+      const nama = document.getElementById('penilaian-nama').value.trim();
+      const nilai = document.getElementById('penilaian-nilai').value;
+      const komentar = document.getElementById('penilaian-komentar').value.trim();
+      
+      if (!nama || !nilai) {
+        if (!nilai) {
+          document.getElementById('error-nilai').classList.remove('hidden');
+        }
+        return;
+      }
+      
+      const data = {
+        nama: nama,
+        nilai: parseInt(nilai),
+        komentar: komentar,
+        timestamp: new Date().toISOString()
+      };
+      
+      const statusElement = document.getElementById('status-penilaian');
+      statusElement.textContent = 'Mengirim penilaian...';
+      statusElement.className = 'text-center text-blue-600';
+      
+      try {
+        // Save to localStorage for demo
+        saveRatingToLocalStorage(data);
+        
+        // Also try to send to Google Sheets (optional)
+        try {
+          await fetch(RATINGS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          });
+        } catch (sheetError) {
+          console.log('Google Sheets submission optional, using localStorage');
+        }
+        
+        statusElement.textContent = '✅ Penilaian berhasil dikirim!';
+        statusElement.className = 'text-center text-green-600';
+        
+        // Reset form
+        e.target.reset();
+        document.querySelectorAll('#modal-penilaian .star').forEach(s => s.classList.remove('active'));
+        document.getElementById('penilaian-nilai').value = '';
+        
+        // Refresh data
+        setTimeout(() => {
+          fetchRatings();
+          closePenilaianModal();
+        }, 1500);
+        
+      } catch (error) {
+        console.error('Error submitting rating:', error);
+        statusElement.textContent = '❌ Gagal mengirim penilaian. Coba lagi.';
+        statusElement.className = 'text-center text-red-600';
+      }
+    }
+
+    // Save rating to localStorage
+    function saveRatingToLocalStorage(rating) {
+      const ratings = JSON.parse(localStorage.getItem('library_ratings') || '[]');
+      ratings.push(rating);
+      localStorage.setItem('library_ratings', JSON.stringify(ratings));
+      return rating;
+    }
+
+    // Fetch ratings from localStorage
+    function fetchRatingsFromLocalStorage() {
+      try {
+        const ratings = JSON.parse(localStorage.getItem('library_ratings') || '[]');
+        allRatings = ratings;
+        
+        // Calculate rating stats per student
+        ratingStats = {};
+        ratings.forEach(rating => {
+          const nama = rating.nama;
+          if (!ratingStats[nama]) {
+            ratingStats[nama] = {
+              total: 0,
+              count: 0,
+              ratings: [],
+              comments: []
+            };
+          }
+          
+          ratingStats[nama].total += rating.nilai;
+          ratingStats[nama].count++;
+          ratingStats[nama].ratings.push(rating.nilai);
+          
+          if (rating.komentar && rating.komentar.trim()) {
+            ratingStats[nama].comments.push({
+              nilai: rating.nilai,
+              komentar: rating.komentar,
+              timestamp: rating.timestamp
+            });
+          }
+        });
+        
+        // Calculate leaderboard
+        calculateLeaderboard();
+        
+        return ratings;
+      } catch (error) {
+        console.error('Error fetching ratings from localStorage:', error);
+        return [];
+      }
+    }
+
+    // Calculate leaderboard
+    function calculateLeaderboard() {
+      leaderboardData = [];
+      
+      for (const [nama, stats] of Object.entries(ratingStats)) {
+        if (stats.count > 0) {
+          const avgRating = (stats.total / stats.count).toFixed(1);
+          leaderboardData.push({
+            nama: nama,
+            avgRating: parseFloat(avgRating),
+            totalRatings: stats.count,
+            totalComments: stats.comments.length
+          });
+        }
+      }
+      
+      // Sort by average rating (descending)
+      leaderboardData.sort((a, b) => b.avgRating - a.avgRating);
+      
+      // Update leaderboard time
+      const now = new Date();
+      document.getElementById('leaderboard-update-time').textContent = 
+        `Update: ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    }
+
+    // Render leaderboard
+    function renderLeaderboard() {
+      const container = document.getElementById('leaderboard-container');
+      
+      if (leaderboardData.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 text-gray-500">
+            <div class="text-4xl mb-2">🏆</div>
+            <p class="text-lg font-medium mb-2">Belum ada penilaian</p>
+            <p class="text-sm">Jadilah yang pertama memberikan penilaian!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const top3 = leaderboardData.slice(0, 3);
+      const others = leaderboardData.slice(3, 10); // Show top 10
+      
+      let html = `
+        <div class="space-y-3">
+          <!-- Top 3 dengan efek khusus -->
+          <div class="space-y-4 mb-6">
+      `;
+      
+      // Top 3
+      top3.forEach((student, index) => {
+        const rankClass = `rank-${index + 1}`;
+        const rankText = index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉';
+        
+        html += `
+          <div class="leaderboard-item bg-gradient-to-r from-white to-gray-50 p-4 rounded-xl border border-gray-200 shadow-sm">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="rank-badge ${rankClass}">
+                  ${rankText}
+                </div>
+                <div>
+                  <h3 class="font-bold text-gray-800">${student.nama}</h3>
+                  <div class="flex items-center gap-2 mt-1">
+                    <div class="flex items-center">
+                      ${[1,2,3,4,5].map(i => `
+                        <span class="text-sm ${i <= student.avgRating ? 'text-amber-400' : 'text-gray-300'}">★</span>
+                      `).join('')}
+                    </div>
+                    <span class="text-sm font-bold text-gray-700">${student.avgRating}</span>
+                    <span class="text-xs text-gray-500">(${student.totalRatings} penilaian)</span>
+                  </div>
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="text-lg font-bold ${index === 0 ? 'text-amber-600' : index === 1 ? 'text-slate-600' : 'text-orange-600'}">
+                  ${student.avgRating}
+                </div>
+                <div class="text-xs text-gray-500">Rating</div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      html += `</div>`;
+      
+      // Others
+      if (others.length > 0) {
+        html += `
+          <div class="mt-6">
+            <h4 class="font-semibold text-gray-700 mb-3">Peraih Rating Terbaik Lainnya</h4>
+            <div class="space-y-2">
+        `;
+        
+        others.forEach((student, index) => {
+          const rank = index + 4;
+          
+          html += `
+            <div class="leaderboard-item p-3 rounded-lg hover:bg-gray-50 border border-gray-100">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="rank-badge rank-other">
+                    ${rank}
+                  </div>
+                  <div>
+                    <h4 class="font-medium text-gray-800">${student.nama}</h4>
+                    <div class="flex items-center gap-2 mt-1">
+                      <div class="flex items-center">
+                        ${[1,2,3,4,5].map(i => `
+                          <span class="text-xs ${i <= student.avgRating ? 'text-amber-400' : 'text-gray-300'}">★</span>
+                        `).join('')}
+                      </div>
+                      <span class="text-xs font-medium text-gray-700">${student.avgRating}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-sm font-bold text-gray-700">${student.avgRating}</div>
+                  <div class="text-xs text-gray-500">${student.totalRatings} penilaian</div>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        
+        html += `</div></div>`;
+      }
+      
+      container.innerHTML = html;
+    }
 
     // Fetch data from Google Sheets
     async function fetchData() {
       try {
+        // Fetch karya data
         const response = await fetch(SHEET_URL);
         const text = await response.text();
         const json = JSON.parse(text.substring(47, text.length - 2));
@@ -764,28 +1381,62 @@
         allData = data;
         filteredData = [...data];
         
+        // Fetch ratings
+        fetchRatingsFromLocalStorage();
+        
+        // Update UI
         generateFilters();
+        renderLeaderboard();
         renderGallery();
         updateStats();
+        populateNamaOptions();
+        
       } catch (error) {
         console.error('Error fetching data:', error);
-        document.getElementById('gallery-grid').innerHTML = `
-          <div class="col-span-full text-center py-16">
-            <div class="text-6xl mb-4 text-gray-300">⚠️</div>
-            <h3 class="text-xl font-bold text-gray-600 mb-2">Gagal memuat data</h3>
-            <p class="text-gray-500 mb-4">Pastikan spreadsheet dapat diakses publik</p>
-            <button 
-              class="add-btn px-6 py-3 rounded-full inline-flex items-center gap-2"
-              onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8_YVZdP0rNNu0h5C9eVD4qB7HJATYReHaAeHZ-V6BCHpoBw/viewform', '_blank')"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-              </svg>
-              Tambah Karya Baru
-            </button>
-          </div>
-        `;
+        showErrorState();
       }
+    }
+
+    // Fetch ratings data
+    async function fetchRatings() {
+      fetchRatingsFromLocalStorage();
+      renderLeaderboard();
+      renderGallery();
+      updateStats();
+      populateNamaOptions();
+    }
+
+    // Populate nama options for datalist
+    function populateNamaOptions() {
+      const datalist = document.getElementById('nama-options');
+      datalist.innerHTML = '';
+      
+      const uniqueNames = [...new Set(allData.map(item => item.nama))];
+      uniqueNames.forEach(nama => {
+        const option = document.createElement('option');
+        option.value = nama;
+        datalist.appendChild(option);
+      });
+    }
+
+    // Show error state
+    function showErrorState() {
+      document.getElementById('gallery-grid').innerHTML = `
+        <div class="col-span-full text-center py-16">
+          <div class="text-6xl mb-4 text-gray-300">⚠️</div>
+          <h3 class="text-xl font-bold text-gray-600 mb-2">Gagal memuat data</h3>
+          <p class="text-gray-500 mb-4">Pastikan spreadsheet dapat diakses publik</p>
+          <button 
+            class="add-btn px-6 py-3 rounded-full inline-flex items-center gap-2"
+            onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8_YVZdP0rNNu0h5C9eVD4qB7HJATYReHaAeHZ-V6BCHpoBw/viewform', '_blank')"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Tambah Karya Baru
+          </button>
+        </div>
+      `;
     }
 
     // Generate filter buttons
@@ -864,6 +1515,24 @@
     function updateStats() {
       document.getElementById('total-count').textContent = allData.length;
       document.getElementById('filtered-count').textContent = filteredData.length;
+      document.getElementById('total-ratings').textContent = allRatings.length;
+      
+      // Calculate top rating
+      let topRating = 0;
+      if (leaderboardData.length > 0) {
+        topRating = leaderboardData[0].avgRating;
+      }
+      document.getElementById('top-rating').textContent = topRating.toFixed(1);
+    }
+
+    // Get ratings for a specific student
+    function getRatingsForStudent(nama) {
+      return allRatings.filter(rating => rating.nama === nama);
+    }
+
+    // Get rating stats for a student
+    function getRatingStatsForStudent(nama) {
+      return ratingStats[nama] || { total: 0, count: 0, ratings: [], comments: [] };
     }
 
     // Extract Drive file ID
@@ -912,6 +1581,31 @@
       return colors[index];
     }
 
+    // Format date
+    function formatDate(dateString) {
+      if (!dateString) return 'Tanggal tidak tersedia';
+      const date = new Date(dateString);
+      if (isNaN(date)) return 'Tanggal tidak tersedia';
+      
+      return date.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+    }
+
+    // Format time
+    function formatTime(dateString) {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      if (isNaN(date)) return '';
+      
+      return date.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
     // Render gallery
     function renderGallery() {
       const grid = document.getElementById('gallery-grid');
@@ -929,19 +1623,16 @@
         const embedUrl = getEmbedUrl(item.uploadKarya);
         const [gradientStart, gradientEnd] = getAvatarGradient(item.nama);
         const initials = item.nama.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        const formattedDate = formatDate(item.timestamp);
         
-        // Format tanggal
-        let formattedDate = 'Tanggal tidak tersedia';
-        if (item.timestamp) {
-          const date = new Date(item.timestamp);
-          if (!isNaN(date)) {
-            formattedDate = date.toLocaleDateString('id-ID', {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric'
-            });
-          }
-        }
+        // Get rating stats for this student
+        const stats = getRatingStatsForStudent(item.nama);
+        const avgRating = stats.count > 0 ? (stats.total / stats.count).toFixed(1) : 0;
+        const totalComments = stats.comments.length;
+        
+        // Determine rating badge class
+        const ratingValue = Math.round(parseFloat(avgRating) || 0);
+        const ratingClass = `rating-${Math.min(Math.max(ratingValue, 1), 5)}`;
         
         return `
           <div class="card-hover animate-fadeInUp" style="animation-delay: ${index * 0.1}s">
@@ -985,6 +1676,32 @@
                     </div>
                   </div>
                   
+                  <!-- Rating Info -->
+                  <div class="flex flex-wrap items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      ${stats.count > 0 ? `
+                        <div class="flex items-center gap-1">
+                          ${[1,2,3,4,5].map(i => `
+                            <span class="text-sm ${i <= avgRating ? 'text-amber-400' : 'text-gray-300'}">★</span>
+                          `).join('')}
+                          <span class="text-sm font-bold text-gray-700 ml-1">${avgRating}</span>
+                        </div>
+                        <span class="text-xs text-gray-500">(${stats.count} penilaian)</span>
+                      ` : `
+                        <span class="text-xs text-gray-500">Belum ada rating</span>
+                      `}
+                    </div>
+                    
+                    ${totalComments > 0 ? `
+                      <button 
+                        onclick="showDetailPenilaian('${item.nama}', '${item.kelas}')"
+                        class="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                      >
+                        💬 ${totalComments} komentar
+                      </button>
+                    ` : ''}
+                  </div>
+                  
                   <!-- Tags -->
                   <div class="flex flex-wrap gap-2">
                     <span class="tag px-3 py-1 rounded-full text-xs font-medium">
@@ -993,6 +1710,11 @@
                     <span class="tag px-3 py-1 rounded-full text-xs font-medium">
                       📅 ${item.tahunAjaran || 'N/A'}
                     </span>
+                    ${stats.count > 0 ? `
+                      <span class="rating-badge ${ratingClass} px-3 py-1 rounded-full text-xs font-medium">
+                        ⭐ ${avgRating}/5
+                      </span>
+                    ` : ''}
                   </div>
                   
                   <!-- Actions -->
@@ -1010,13 +1732,34 @@
                           Lihat Karya
                         </span>
                       </button>
-                    ` : ''}
+                    ` : `
+                      <button 
+                        class="flex-1 py-2 px-4 rounded-xl font-semibold text-sm transition-all bg-gray-100 text-gray-600 cursor-not-allowed"
+                        disabled
+                      >
+                        Tidak Ada Preview
+                      </button>
+                    `}
+                    
+                    <button 
+                      class="py-2 px-4 rounded-xl font-semibold text-sm transition-all bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md hover:shadow-lg"
+                      onclick="openPenilaianModalForStudent('${item.nama}')"
+                    >
+                      <span class="flex items-center justify-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                        </svg>
+                        Nilai
+                      </span>
+                    </button>
+                    
                     ${item.uploadKarya ? `
                       <a 
                         href="${item.uploadKarya}" 
                         target="_blank" 
                         rel="noopener noreferrer"
                         class="py-2 px-4 rounded-xl font-semibold text-sm transition-all bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200"
+                        title="Buka di tab baru"
                       >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
@@ -1032,7 +1775,149 @@
       }).join('');
     }
 
-    // Modal functions
+    // Open penilaian modal for specific student
+    function openPenilaianModalForStudent(nama) {
+      selectedKaryaForRating = nama;
+      const input = document.getElementById('penilaian-nama');
+      input.value = nama;
+      input.readOnly = true;
+      input.classList.add('bg-gray-100', 'cursor-not-allowed');
+      
+      openPenilaianModal();
+    }
+
+    // Open penilaian modal
+    function openPenilaianModal() {
+      const modal = document.getElementById('modal-penilaian');
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Close penilaian modal
+    function closePenilaianModal() {
+      const modal = document.getElementById('modal-penilaian');
+      modal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+      
+      // Reset form
+      document.getElementById('form-penilaian').reset();
+      document.querySelectorAll('#modal-penilaian .star').forEach(s => s.classList.remove('active'));
+      document.getElementById('penilaian-nilai').value = '';
+      document.getElementById('status-penilaian').textContent = '';
+      
+      // Reset input if it was locked
+      const input = document.getElementById('penilaian-nama');
+      input.readOnly = false;
+      input.classList.remove('bg-gray-100', 'cursor-not-allowed');
+      
+      selectedKaryaForRating = null;
+    }
+
+    // Show detail penilaian
+    function showDetailPenilaian(nama, kelas) {
+      const stats = getRatingStatsForStudent(nama);
+      const avgRating = stats.count > 0 ? (stats.total / stats.count).toFixed(1) : 0;
+      const distribution = getRatingDistribution(stats.ratings);
+      const mostCommon = getMostCommonRating(distribution);
+      const totalComments = stats.comments.length;
+      
+      // Update modal content
+      document.getElementById('detail-title').textContent = `Penilaian: ${nama}`;
+      document.getElementById('detail-subtitle').textContent = `${kelas} • ${stats.count} penilaian`;
+      document.getElementById('avg-rating').textContent = avgRating;
+      document.getElementById('total-rating-count').textContent = stats.count;
+      document.getElementById('total-comments').textContent = totalComments;
+      document.getElementById('star-distribution').textContent = `${mostCommon}★`;
+      document.getElementById('distribution-count').textContent = `${stats.count} penilaian`;
+      
+      // Update star distribution bars
+      const barsContainer = document.getElementById('star-distribution-bars');
+      barsContainer.innerHTML = '';
+      
+      for (let i = 5; i >= 1; i--) {
+        const percentage = stats.count > 0 ? (distribution[i] / stats.count * 100) : 0;
+        const bar = `
+          <div class="flex items-center">
+            <span class="w-8 text-sm text-gray-600">${i}★</span>
+            <div class="flex-1 ml-2">
+              <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-amber-500 rounded-full" style="width: ${percentage}%"></div>
+              </div>
+            </div>
+            <span class="w-8 text-right text-sm text-gray-600 ml-2">${distribution[i]}</span>
+          </div>
+        `;
+        barsContainer.innerHTML += bar;
+      }
+      
+      // Update comments list
+      const commentsList = document.getElementById('comments-list');
+      
+      if (totalComments === 0) {
+        commentsList.innerHTML = `
+          <div class="text-center py-8 text-gray-500">
+            <div class="text-4xl mb-2">💬</div>
+            <p>Belum ada komentar</p>
+          </div>
+        `;
+      } else {
+        // Sort comments by timestamp (newest first)
+        const sortedComments = [...stats.comments].sort((a, b) => 
+          new Date(b.timestamp) - new Date(a.timestamp)
+        );
+        
+        commentsList.innerHTML = sortedComments.map(comment => `
+          <div class="comment-item">
+            <div class="flex justify-between mb-2">
+              <div class="flex items-center gap-2">
+                ${[1,2,3,4,5].map(i => `
+                  <span class="text-sm ${i <= comment.nilai ? 'text-amber-400' : 'text-gray-300'}">★</span>
+                `).join('')}
+                <span class="text-sm font-medium text-gray-700">${comment.nilai}.0</span>
+              </div>
+              <span class="text-xs text-gray-500">${formatDate(comment.timestamp)} ${formatTime(comment.timestamp)}</span>
+            </div>
+            <p class="text-gray-700">${comment.komentar}</p>
+          </div>
+        `).join('');
+      }
+      
+      // Show modal
+      const modal = document.getElementById('modal-detail-penilaian');
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Get rating distribution
+    function getRatingDistribution(ratings) {
+      const distribution = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
+      ratings.forEach(rating => {
+        distribution[rating]++;
+      });
+      return distribution;
+    }
+
+    // Get most common rating
+    function getMostCommonRating(distribution) {
+      let max = 0;
+      let mostCommon = 5;
+      for (let i = 5; i >= 1; i--) {
+        if (distribution[i] > max) {
+          max = distribution[i];
+          mostCommon = i;
+        }
+      }
+      return mostCommon;
+    }
+
+    // Close detail modal
+    function closeDetailModal() {
+      const modal = document.getElementById('modal-detail-penilaian');
+      modal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    // Modal functions for karya preview
     function openModal(nama, kelas, tahun, embedUrl) {
       const modal = document.getElementById('modal');
       document.getElementById('modal-title').textContent = `Karya: ${nama}`;
@@ -1040,25 +1925,16 @@
       document.getElementById('modal-iframe-container').innerHTML = `
         <iframe src="${embedUrl}" class="w-full h-full border-0" loading="lazy"></iframe>
       `;
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
     }
 
-    document.getElementById('close-modal').addEventListener('click', () => {
+    function closeModal() {
       const modal = document.getElementById('modal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
+      modal.style.display = 'none';
+      document.body.style.overflow = 'auto';
       document.getElementById('modal-iframe-container').innerHTML = '';
-    });
-
-    document.getElementById('modal').addEventListener('click', (e) => {
-      if (e.target.id === 'modal') {
-        const modal = document.getElementById('modal');
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-        document.getElementById('modal-iframe-container').innerHTML = '';
-      }
-    });
+    }
 
     // Config change handler
     async function onConfigChange(cfg) {
@@ -1127,9 +2003,6 @@
       });
       config = window.elementSdk.config || defaultConfig;
     }
-
-    // Initialize
-    fetchData();
   </script>
 </body>
 </html>
