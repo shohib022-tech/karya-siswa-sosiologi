@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Karya Siswa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    * {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    
+    .card-hover {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .gradient-border {
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      padding: 3px;
+      border-radius: 20px;
+    }
+    
+    .gradient-border-inner {
+      background: #ffffff;
+      border-radius: 17px;
+    }
+    
+    .iframe-container {
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      background: linear-gradient(145deg, #f8fafc, #f1f5f9);
+      border: 1px solid #e2e8f0;
+    }
+    
+    .iframe-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 32px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6, #10b981);
+      opacity: 0.08;
+      z-index: 1;
+    }
+    
+    .browser-dots {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      display: flex;
+      gap: 6px;
+      z-index: 2;
+    }
+    
+    .browser-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    
+    .filter-btn {
+      transition: all 0.3s ease;
+    }
+    
+    .filter-btn.active {
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+      color: white;
+      transform: scale(1.05);
+    }
+    
+    .shimmer {
+      background: linear-gradient(90deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .animate-fadeInUp {
+      animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    .tag {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      color: #4f46e5;
+    }
+    
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: 4px;
+    }
+    
+    /* Tombol Tambah Karya */
+    .add-btn {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2), 0 2px 4px -1px rgba(16, 185, 129, 0.1);
+    }
+    
+    .add-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3), 0 4px 6px -2px rgba(16, 185, 129, 0.1);
+    }
+    
+    /* Prosedur Tugas Styling */
+    .prosedur-step {
+      counter-increment: step-counter;
+      position: relative;
+      padding-left: 3.5rem;
+    }
+    
+    .prosedur-step::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 2.5rem;
+      height: 2.5rem;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 0.875rem;
+    }
+    
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+    
+    .accordion-content.open {
+      max-height: 1000px;
+    }
+    
+    @media (max-width: 768px) {
+      .prosedur-step {
+        padding-left: 2.5rem;
+      }
+      
+      .prosedur-step::before {
+        width: 2rem;
+        height: 2rem;
+        font-size: 0.75rem;
+      }
+      
+      .mobile-collapse {
+        transition: all 0.3s ease;
+      }
+    }
+  </style>
+</head>
+<body class="h-full bg-gradient-to-br from-gray-50 to-blue-50 text-gray-800 overflow-auto">
+  <div id="app" class="min-h-full w-full">
+    <!-- Header -->
+    <header class="relative overflow-hidden py-12 px-6">
+      <div class="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-transparent"></div>
+      <div class="absolute top-0 right-0 w-96 h-96 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
+      <div class="absolute bottom-0 left-0 w-72 h-72 bg-purple-100 rounded-full blur-3xl opacity-50"></div>
+      
+      <div class="relative max-w-7xl mx-auto text-center">
+        <!-- Header Container -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-effect mb-4 md:mb-0">
+            <span class="text-2xl">📚</span>
+            <span class="text-sm font-medium text-blue-600">Library Mode</span>
+          </div>
+          
+          <!-- Tombol Tambah Karya -->
+          <button 
+            id="tambah-karya-btn" 
+            class="add-btn px-6 py-3 rounded-full flex items-center gap-2"
+            onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8_YVZdP0rNNu0h5C9eVD4qB7HJATYReHaAeHZ-V6BCHpoBw/viewform', '_blank')"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Tambah Karya Baru
+          </button>
+        </div>
+        
+        <h1 id="gallery-title" class="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+          Library Karya Siswa
+        </h1>
+        
+        <p id="subtitle-text" class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Mata Pelajaran Sosiologi
+        </p>
+      </div>
+    </header>
+    
+    <!-- Prosedur Tugas Section -->
+    <section class="px-6 py-8 max-w-7xl mx-auto">
+      <div class="glass-effect rounded-2xl p-6 mb-8">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">📋</span>
+            <h2 class="text-2xl font-bold text-gray-800">Prosedur Tugas: Memahami Konflik & Membuat Infografis</h2>
+          </div>
+          <button 
+            id="toggle-prosedur" 
+            class="md:hidden px-4 py-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+          >
+            <svg id="toggle-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <div id="prosedur-content" class="space-y-8 mobile-collapse">
+          <!-- Tujuan Pembelajaran -->
+          <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-100">
+            <h3 class="text-xl font-bold text-blue-700 mb-4 flex items-center gap-2">
+              <span class="text-2xl">🎯</span>
+              Tujuan Pembelajaran
+            </h3>
+            <p class="text-gray-700 mb-4">Agar siswa mampu:</p>
+            <ul class="space-y-3 ml-2">
+              <li class="flex items-start gap-3">
+                <span class="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">1</span>
+                <span class="text-gray-700">Menemukan jurnal terkait konflik</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">2</span>
+                <span class="text-gray-700">Menganalisis isi jurnal dengan baik (penyebab konflik, jenis konflik, penyelesaian)</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">3</span>
+                <span class="text-gray-700">Menyusun pemikiran sendiri berdasarkan jurnal</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <span class="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">4</span>
+                <span class="text-gray-700">Mengkomunikasikan hasil analisis dalam bentuk infografis yang informatif</span>
+              </li>
+            </ul>
+          </div>
+          
+          <!-- Langkah Kerja -->
+          <div>
+            <h3 class="text-xl font-bold text-purple-700 mb-6 flex items-center gap-2">
+              <span class="text-2xl">📘</span>
+              Langkah Kerja (Prosedur)
+            </h3>
+            
+            <ol class="space-y-8">
+              <!-- Step 1 -->
+              <li class="prosedur-step">
+                <div class="bg-white p-6 rounded-xl border border-purple-100 shadow-sm">
+                  <h4 class="text-lg font-bold text-gray-800 mb-3">1. Mencari Jurnal tentang Konflik (C1 – C2)</h4>
+                  
+                  <div class="mb-4">
+                    <h5 class="font-semibold text-blue-600 mb-2 flex items-center gap-2">
+                      <span>👉</span> Instruksi Pencarian Jurnal
+                    </h5>
+                    <p class="text-gray-700 mb-3">Gunakan search engine jurnal seperti:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                      <a href="https://scholar.google.com/" target="_blank" class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
+                        <span class="text-xl">🔍</span>
+                        <div>
+                          <p class="font-medium text-gray-800">Google Scholar</p>
+                          <p class="text-sm text-gray-500">scholar.google.com</p>
+                        </div>
+                      </a>
+                      <a href="https://www.researchgate.net/" target="_blank" class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200">
+                        <span class="text-xl">📊</span>
+                        <div>
+                          <p class="font-medium text-gray-800">ResearchGate</p>
+                          <p class="text-sm text-gray-500">researchgate.net</p>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                  
+                  <div class="mb-4">
+                    <h5 class="font-semibold text-green-600 mb-2">Keyword pencarian yang dianjurkan:</h5>
+                    <div class="flex flex-wrap gap-2">
+                      <span class="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm border border-green-200">"conflict causes and resolution"</span>
+                      <span class="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm border border-green-200">"conflict theory in sociology"</span>
+                      <span class="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm border border-green-200">"types of conflict and solutions"</span>
+                    </div>
+                  </div>
+                  
+                  <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                    <p class="text-yellow-800 font-medium flex items-start gap-2">
+                      <span class="text-xl">📌</span>
+                      Tulis link jurnal yang kamu pilih dan pastikan jurnal tersebut berbahasa Indonesia atau Inggris.
+                    </p>
+                  </div>
+                </div>
+              </li>
+              
+              <!-- Step 2 -->
+              <li class="prosedur-step">
+                <div class="bg-white p-6 rounded-xl border border-purple-100 shadow-sm">
+                  <h4 class="text-lg font-bold text-gray-800 mb-3">2. Membaca & Menganalisis Isi Jurnal (C2 – C4)</h4>
+                  
+                  <p class="text-gray-700 mb-4">Bacalah jurnal secara teliti dan catat:</p>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="space-y-2">
+                      <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                        <span class="text-gray-700">Judul jurnal</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                        <span class="text-gray-700">Penulis & tahun terbit</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                        <span class="text-gray-700">Jenis konflik yang dibahas</span>
+                      </div>
+                    </div>
+                    <div class="space-y-2">
+                      <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                        <span class="text-gray-700">Penyebab konflik</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                        <span class="text-gray-700">Dampak konflik</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                        <span class="text-gray-700">Cara penyelesaian konflik</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="mb-6">
+                    <h5 class="font-semibold text-green-600 mb-2">Format Analisis Tulisan Tangan:</h5>
+                    <div class="overflow-x-auto">
+                      <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                        <thead class="bg-gray-50">
+                          <tr>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700 border-b">Komponen</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700 border-b">Isi</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="border-b border-gray-100">
+                            <td class="py-3 px-4 text-sm text-gray-600">Judul Jurnal</td>
+                            <td class="py-3 px-4 text-sm text-gray-500">…</td>
+                          </tr>
+                          <tr class="border-b border-gray-100">
+                            <td class="py-3 px-4 text-sm text-gray-600">Penulis</td>
+                            <td class="py-3 px-4 text-sm text-gray-500">…</td>
+                          </tr>
+                          <tr class="border-b border-gray-100">
+                            <td class="py-3 px-4 text-sm text-gray-600">Penyebab Konflik</td>
+                            <td class="py-3 px-4 text-sm text-gray-500">…</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  
+                  <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <p class="text-blue-800 font-medium flex items-start gap-2">
+                      <span class="text-xl">📌</span>
+                      Catat minimal 5 poin penting yang kamu temukan dari jurnal tersebut.
+                    </p>
+                  </div>
+                </div>
+              </li>
+              
+              <!-- Step 3 -->
+              <li class="prosedur-step">
+                <div class="bg-white p-6 rounded-xl border border-purple-100 shadow-sm">
+                  <h4 class="text-lg font-bold text-gray-800 mb-3">3. Menyusun Esai Singkat (C3 – C5)</h4>
+                  
+                  <p class="text-gray-700 mb-4">Buat tulisan tangan minimal 1 halaman yang berisi:</p>
+                  
+                  <div class="space-y-3 mb-6">
+                    <div class="flex items-start gap-3 p-3 bg-orange-50 rounded-lg border border-orange-100">
+                      <span class="text-xl">📝</span>
+                      <div>
+                        <p class="font-medium text-orange-800">Ringkasan isi jurnal</p>
+                        <p class="text-sm text-orange-600">Jelaskan inti dari jurnal yang kamu baca</p>
+                      </div>
+                    </div>
+                    <div class="flex items-start gap-3 p-3 bg-purple-50 rounded-lg border border-purple-100">
+                      <span class="text-xl">💭</span>
+                      <div>
+                        <p class="font-medium text-purple-800">Pendapat kamu tentang penyebab konflik</p>
+                        <p class="text-sm text-purple-600">Berikan analisis pribadi berdasarkan pemahamanmu</p>
+                      </div>
+                    </div>
+                    <div class="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-100">
+                      <span class="text-xl">⚖️</span>
+                      <div>
+                        <p class="font-medium text-green-800">Argumentasi setuju/tidak setuju</p>
+                        <p class="text-sm text-green-600">Berikan alasan mendukung atau menolak penyelesaian dalam jurnal</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-lg border border-purple-200">
+                    <p class="text-purple-800 font-medium flex items-start gap-2">
+                      <span class="text-xl">💡</span>
+                      <span>Fokus: Logika penulisan, relevansi dengan jurnal, dan argumentasi pribadi</span>
+                    </p>
+                  </div>
+                </div>
+              </li>
+              
+              <!-- Step 4 -->
+              <li class="prosedur-step">
+                <div class="bg-white p-6 rounded-xl border border-purple-100 shadow-sm">
+                  <h4 class="text-lg font-bold text-gray-800 mb-3">4. Membuat Infografis (C6)</h4>
+                  
+                  <p class="text-gray-700 mb-6">Siswa menggunakan laptop/PC untuk membuat infografis berdasarkan hasil analisis. Kamu boleh memilih salah satu platform:</p>
+                  
+                  <!-- Opsi A -->
+                  <div class="mb-8">
+                    <div class="flex items-center gap-3 mb-4">
+                      <span class="text-2xl">🖌️</span>
+                      <h5 class="text-lg font-bold text-blue-700">Opsi A – Canva</h5>
+                    </div>
+                    
+                    <div class="space-y-4 ml-8">
+                      <div class="flex items-start gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm">1</span>
+                        <div>
+                          <p class="text-gray-700">Buka <a href="https://www.canva.com/" target="_blank" class="text-blue-600 hover:underline font-medium">https://www.canva.com/</a></p>
+                        </div>
+                      </div>
+                      <div class="flex items-start gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm">2</span>
+                        <p class="text-gray-700">Cari template dengan kata kunci: <span class="bg-blue-50 text-blue-700 px-2 py-1 rounded text-sm font-medium">Infographic</span></p>
+                      </div>
+                      <div class="flex items-start gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm">3</span>
+                        <p class="text-gray-700">Pilih template yang sesuai</p>
+                      </div>
+                      <div class="flex items-start gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm">4</span>
+                        <div>
+                          <p class="text-gray-700 mb-2">Masukkan konten inti:</p>
+                          <ul class="space-y-1 ml-2">
+                            <li class="flex items-center gap-2">
+                              <span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                              <span class="text-gray-600">Judul tugas</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                              <span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                              <span class="text-gray-600">Penyebab konflik</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                              <span class="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                              <span class="text-gray-600">Visualisasi poin penting</span>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Opsi B -->
+                  <div>
+                    <div class="flex items-center gap-3 mb-4">
+                      <span class="text-2xl">🧠</span>
+                      <h5 class="text-lg font-bold text-purple-700">Opsi B – NotebookLM Google</h5>
+                      <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">Cara Membantu Ide Infografis</span>
+                    </div>
+                    
+                    <div class="mb-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
+                      <p class="text-purple-800">
+                        <span class="font-bold">👉 NotebookLM Google</span> adalah alat AI untuk membantu kamu menyusun ide konten sebelum ditata di infografis.
+                      </p>
+                    </div>
+                    
+                    <div class="space-y-4 ml-8">
+                      <div class="flex items-start gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold text-sm">1</span>
+                        <p class="text-gray-700">Buka: <a href="https://notebooklm.google/" target="_blank" class="text-purple-600 hover:underline font-medium">https://notebooklm.google/</a></p>
+                      </div>
+                      <div class="flex items-start gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold text-sm">2</span>
+                        <p class="text-gray-700">Login dengan Google Account</p>
+                      </div>
+                      <div class="flex items-start gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold text-sm">3</span>
+                        <p class="text-gray-700">Upload jurnal yang kamu pilih (file PDF/Word)</p>
+                      </div>
+                      <div class="flex items-start gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold text-sm">4</span>
+                        <div>
+                          <p class="text-gray-700 mb-2">Ketik pertanyaan untuk AI, misalnya:</p>
+                          <div class="space-y-2 ml-2">
+                            <div class="flex items-start gap-2">
+                              <span class="text-purple-500">•</span>
+                              <p class="text-gray-600">"Ringkas penyebab konflik dari isi jurnal ini"</p>
+                            </div>
+                            <div class="flex items-start gap-2">
+                              <span class="text-purple-500">•</span>
+                              <p class="text-gray-600">"Buat poin-poin cara penyelesaian konflik secara ringkas"</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="mt-6 bg-green-50 p-4 rounded-lg border border-green-200">
+                      <p class="text-green-800 font-medium flex items-start gap-2">
+                        <span class="text-xl">🎯</span>
+                        <span>Gunakan hasil ringkasan NotebookLM sebagai bahan konten yang kamu susun di Canva atau alat lain.</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Filters -->
+    <section class="px-6 py-6 max-w-7xl mx-auto">
+      <div class="glass-effect rounded-2xl p-6">
+        <div class="flex flex-col md:flex-row gap-6">
+          <!-- Filter Kelas -->
+          <div class="flex-1">
+            <label class="block text-sm font-semibold text-blue-600 mb-3 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+              Filter Kelas
+            </label>
+            <div id="kelas-filters" class="flex flex-wrap gap-2">
+              <button class="filter-btn active px-4 py-2 rounded-xl text-sm font-medium bg-blue-50 text-blue-700 hover:bg-blue-100" data-kelas="all">
+                Semua Kelas
+              </button>
+            </div>
+          </div>
+          
+          <!-- Filter Tahun Ajaran -->
+          <div class="flex-1">
+            <label class="block text-sm font-semibold text-purple-600 mb-3 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              Filter Tahun Ajaran
+            </label>
+            <div id="tahun-filters" class="flex flex-wrap gap-2">
+              <button class="filter-btn active px-4 py-2 rounded-xl text-sm font-medium bg-purple-50 text-purple-700 hover:bg-purple-100" data-tahun="all">
+                Semua Tahun
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Stats -->
+        <div class="mt-6 pt-6 border-t border-gray-200 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex flex-wrap items-center gap-6">
+            <div class="flex items-center gap-2">
+              <span class="text-xl text-blue-500">📊</span>
+              <span class="text-gray-600">Total Karya:</span>
+              <span id="total-count" class="font-bold text-blue-600">0</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xl text-purple-500">👁️</span>
+              <span class="text-gray-600">Ditampilkan:</span>
+              <span id="filtered-count" class="font-bold text-purple-600">0</span>
+            </div>
+          </div>
+          
+          <!-- Tombol Tambah Karya (Mobile) -->
+          <button 
+            id="tambah-karya-btn-mobile" 
+            class="add-btn px-4 py-2 rounded-full flex items-center gap-2 md:hidden"
+            onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8_YVZdP0rNNu0h5C9eVD4qB7HJATYReHaAeHZ-V6BCHpoBw/viewform', '_blank')"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Tambah Karya
+          </button>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Gallery Grid -->
+    <section class="px-6 py-8 max-w-7xl mx-auto">
+      <div id="gallery-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Loading skeleton -->
+        <div class="shimmer rounded-2xl h-96"></div>
+        <div class="shimmer rounded-2xl h-96"></div>
+        <div class="shimmer rounded-2xl h-96"></div>
+      </div>
+      
+      <!-- Empty State -->
+      <div id="empty-state" class="hidden text-center py-16">
+        <div class="text-6xl mb-4 text-gray-300">🔍</div>
+        <h3 class="text-xl font-bold text-gray-600 mb-2">Tidak ada karya ditemukan</h3>
+        <p class="text-gray-500">Coba ubah filter untuk melihat karya lainnya</p>
+        <button 
+          class="add-btn mt-4 px-6 py-3 rounded-full inline-flex items-center gap-2"
+          onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8_YVZdP0rNNu0h5C9eVD4qB7HJATYReHaAeHZ-V6BCHpoBw/viewform', '_blank')"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Tambah Karya Pertama
+        </button>
+      </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="py-8 px-6 text-center border-t border-gray-200 mt-8">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+          <p class="text-gray-500 text-sm">
+            © 2024 Library Karya Backend • Dibuat dengan ❤️ untuk pembelajaran
+          </p>
+          <button 
+            class="px-5 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-50 to-purple-50 text-blue-600 hover:bg-blue-100 transition-colors border border-blue-200"
+            onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8_YVZdP0rNNu0h5C9eVD4qB7HJATYReHaAeHZ-V6BCHpoBw/viewform', '_blank')"
+          >
+            ✨ Tambah Karya Baru
+          </button>
+        </div>
+      </div>
+    </footer>
+  </div>
+  
+  <!-- Modal Preview -->
+  <div id="modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="relative w-full max-w-5xl max-h-[90%] bg-white rounded-2xl overflow-hidden shadow-2xl">
+      <div class="flex items-center justify-between p-4 border-b border-gray-200">
+        <div>
+          <h3 id="modal-title" class="font-bold text-lg text-gray-800"></h3>
+          <p id="modal-info" class="text-sm text-gray-600"></p>
+        </div>
+        <button id="close-modal" class="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div id="modal-iframe-container" class="w-full h-[70vh]"></div>
+      <div class="p-4 border-t border-gray-200 flex justify-between items-center">
+        <p class="text-sm text-gray-500">Karya dari Library Backend</p>
+        <button 
+          class="px-4 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-blue-50 to-purple-50 text-blue-600 hover:bg-blue-100 transition-colors"
+          onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8_YVZdP0rNNu0h5C9eVD4qB7HJATYReHaAeHZ-V6BCHpoBw/viewform', '_blank')"
+        >
+          + Tambah Karya Lainnya
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Default configuration
+    const defaultConfig = {
+      gallery_title: 'Library Karya Siswa',
+      subtitle_text: 'Koleksi karya siswa dalam pengembangan backend tanpa menggunakan API eksternal',
+      primary_color: '#3b82f6',
+      secondary_color: '#8b5cf6',
+      background_color: '#f8fafc',
+      surface_color: '#ffffff',
+      text_color: '#1f2937'
+    };
+
+    let config = { ...defaultConfig };
+    let allData = [];
+    let filteredData = [];
+    let currentKelasFilter = 'all';
+    let currentTahunFilter = 'all';
+
+    // Google Sheets data
+    const SHEET_ID = '1DZSdEe6mgS8jOc4Q_pxPIrIjuAKrdqb0sZL2eUJflWs';
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+    // Toggle Prosedur untuk mobile
+    document.getElementById('toggle-prosedur').addEventListener('click', function() {
+      const content = document.getElementById('prosedur-content');
+      const icon = document.getElementById('toggle-icon');
+      
+      content.classList.toggle('mobile-collapse');
+      if (content.classList.contains('mobile-collapse')) {
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>';
+      } else {
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>';
+      }
+    });
+
+    // Fetch data from Google Sheets
+    async function fetchData() {
+      try {
+        const response = await fetch(SHEET_URL);
+        const text = await response.text();
+        const json = JSON.parse(text.substring(47, text.length - 2));
+        
+        const rows = json.table.rows;
+        const data = [];
+        
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i].c;
+          if (row && row[1] && row[1].v) {
+            data.push({
+              timestamp: row[0] ? row[0].v : '',
+              nama: row[1] ? row[1].v : '',
+              kelas: row[2] ? row[2].v : '',
+              uploadKarya: row[3] ? row[3].v : '',
+              tahunAjaran: row[4] ? row[4].v : ''
+            });
+          }
+        }
+        
+        allData = data;
+        filteredData = [...data];
+        
+        generateFilters();
+        renderGallery();
+        updateStats();
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        document.getElementById('gallery-grid').innerHTML = `
+          <div class="col-span-full text-center py-16">
+            <div class="text-6xl mb-4 text-gray-300">⚠️</div>
+            <h3 class="text-xl font-bold text-gray-600 mb-2">Gagal memuat data</h3>
+            <p class="text-gray-500 mb-4">Pastikan spreadsheet dapat diakses publik</p>
+            <button 
+              class="add-btn px-6 py-3 rounded-full inline-flex items-center gap-2"
+              onclick="window.open('https://docs.google.com/forms/d/e/1FAIpQLSd8_YVZdP0rNNu0h5C9eVD4qB7HJATYReHaAeHZ-V6BCHpoBw/viewform', '_blank')"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Tambah Karya Baru
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    // Generate filter buttons
+    function generateFilters() {
+      const kelasSet = new Set();
+      const tahunSet = new Set();
+      
+      allData.forEach(item => {
+        if (item.kelas) kelasSet.add(item.kelas);
+        if (item.tahunAjaran) tahunSet.add(item.tahunAjaran);
+      });
+      
+      const kelasContainer = document.getElementById('kelas-filters');
+      kelasContainer.innerHTML = `
+        <button class="filter-btn active px-4 py-2 rounded-xl text-sm font-medium bg-blue-50 text-blue-700 hover:bg-blue-100" data-kelas="all">
+          Semua Kelas
+        </button>
+      `;
+      
+      [...kelasSet].sort().forEach(kelas => {
+        const btn = document.createElement('button');
+        btn.className = 'filter-btn px-4 py-2 rounded-xl text-sm font-medium bg-blue-50 text-blue-700 hover:bg-blue-100';
+        btn.dataset.kelas = kelas;
+        btn.textContent = kelas;
+        kelasContainer.appendChild(btn);
+      });
+      
+      const tahunContainer = document.getElementById('tahun-filters');
+      tahunContainer.innerHTML = `
+        <button class="filter-btn active px-4 py-2 rounded-xl text-sm font-medium bg-purple-50 text-purple-700 hover:bg-purple-100" data-tahun="all">
+          Semua Tahun
+        </button>
+      `;
+      
+      [...tahunSet].sort().forEach(tahun => {
+        const btn = document.createElement('button');
+        btn.className = 'filter-btn px-4 py-2 rounded-xl text-sm font-medium bg-purple-50 text-purple-700 hover:bg-purple-100';
+        btn.dataset.tahun = tahun;
+        btn.textContent = tahun;
+        tahunContainer.appendChild(btn);
+      });
+      
+      // Add event listeners
+      document.querySelectorAll('#kelas-filters .filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#kelas-filters .filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentKelasFilter = btn.dataset.kelas;
+          applyFilters();
+        });
+      });
+      
+      document.querySelectorAll('#tahun-filters .filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#tahun-filters .filter-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentTahunFilter = btn.dataset.tahun;
+          applyFilters();
+        });
+      });
+    }
+
+    // Apply filters
+    function applyFilters() {
+      filteredData = allData.filter(item => {
+        const kelasMatch = currentKelasFilter === 'all' || item.kelas === currentKelasFilter;
+        const tahunMatch = currentTahunFilter === 'all' || item.tahunAjaran === currentTahunFilter;
+        return kelasMatch && tahunMatch;
+      });
+      
+      renderGallery();
+      updateStats();
+    }
+
+    // Update stats
+    function updateStats() {
+      document.getElementById('total-count').textContent = allData.length;
+      document.getElementById('filtered-count').textContent = filteredData.length;
+    }
+
+    // Extract Drive file ID
+    function extractDriveId(url) {
+      if (!url) return null;
+      const patterns = [
+        /\/file\/d\/([a-zA-Z0-9_-]+)/,
+        /id=([a-zA-Z0-9_-]+)/,
+        /\/d\/([a-zA-Z0-9_-]+)/
+      ];
+      
+      for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match) return match[1];
+      }
+      return null;
+    }
+
+    // Get embed URL
+    function getEmbedUrl(url) {
+      if (!url) return null;
+      
+      const driveId = extractDriveId(url);
+      if (driveId) {
+        return `https://drive.google.com/file/d/${driveId}/preview`;
+      }
+      
+      if (url.includes('docs.google.com')) {
+        return url.replace('/edit', '/preview').replace('/view', '/preview');
+      }
+      
+      return url;
+    }
+
+    // Generate random gradient for avatar
+    function getAvatarGradient(name) {
+      const colors = [
+        ['#3b82f6', '#8b5cf6'],
+        ['#10b981', '#059669'],
+        ['#f59e0b', '#d97706'],
+        ['#ef4444', '#dc2626'],
+        ['#8b5cf6', '#ec4899'],
+        ['#06b6d4', '#3b82f6']
+      ];
+      const index = name.charCodeAt(0) % colors.length;
+      return colors[index];
+    }
+
+    // Render gallery
+    function renderGallery() {
+      const grid = document.getElementById('gallery-grid');
+      const emptyState = document.getElementById('empty-state');
+      
+      if (filteredData.length === 0) {
+        grid.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      
+      emptyState.classList.add('hidden');
+      
+      grid.innerHTML = filteredData.map((item, index) => {
+        const embedUrl = getEmbedUrl(item.uploadKarya);
+        const [gradientStart, gradientEnd] = getAvatarGradient(item.nama);
+        const initials = item.nama.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        
+        // Format tanggal
+        let formattedDate = 'Tanggal tidak tersedia';
+        if (item.timestamp) {
+          const date = new Date(item.timestamp);
+          if (!isNaN(date)) {
+            formattedDate = date.toLocaleDateString('id-ID', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric'
+            });
+          }
+        }
+        
+        return `
+          <div class="card-hover animate-fadeInUp" style="animation-delay: ${index * 0.1}s">
+            <div class="gradient-border">
+              <div class="gradient-border-inner p-4">
+                <!-- Browser Preview -->
+                <div class="iframe-container mb-4">
+                  <div class="browser-dots">
+                    <div class="browser-dot" style="background: #ff5f56;"></div>
+                    <div class="browser-dot" style="background: #ffbd2e;"></div>
+                    <div class="browser-dot" style="background: #27ca40;"></div>
+                  </div>
+                  ${embedUrl ? `
+                    <iframe 
+                      src="${embedUrl}" 
+                      class="w-full h-48 mt-8 border-0 bg-white"
+                      loading="lazy"
+                      sandbox="allow-scripts allow-same-origin"
+                    ></iframe>
+                  ` : `
+                    <div class="w-full h-48 mt-8 flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+                      <div class="text-center">
+                        <div class="text-4xl mb-2 text-gray-300">📄</div>
+                        <p class="text-sm text-gray-500">Preview tidak tersedia</p>
+                      </div>
+                    </div>
+                  `}
+                </div>
+                
+                <!-- Card Content -->
+                <div class="space-y-3">
+                  <!-- Author Info -->
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shadow-md" 
+                         style="background: linear-gradient(135deg, ${gradientStart}, ${gradientEnd});">
+                      ${initials}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h3 class="font-bold text-gray-800 truncate">${item.nama}</h3>
+                      <p class="text-xs text-gray-500">${formattedDate}</p>
+                    </div>
+                  </div>
+                  
+                  <!-- Tags -->
+                  <div class="flex flex-wrap gap-2">
+                    <span class="tag px-3 py-1 rounded-full text-xs font-medium">
+                      📚 ${item.kelas || 'N/A'}
+                    </span>
+                    <span class="tag px-3 py-1 rounded-full text-xs font-medium">
+                      📅 ${item.tahunAjaran || 'N/A'}
+                    </span>
+                  </div>
+                  
+                  <!-- Actions -->
+                  <div class="flex gap-2 pt-2">
+                    ${embedUrl ? `
+                      <button 
+                        class="flex-1 py-2 px-4 rounded-xl font-semibold text-sm transition-all bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md hover:shadow-lg"
+                        onclick="openModal('${item.nama}', '${item.kelas}', '${item.tahunAjaran}', '${embedUrl}')"
+                      >
+                        <span class="flex items-center justify-center gap-2">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                          </svg>
+                          Lihat Karya
+                        </span>
+                      </button>
+                    ` : ''}
+                    ${item.uploadKarya ? `
+                      <a 
+                        href="${item.uploadKarya}" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        class="py-2 px-4 rounded-xl font-semibold text-sm transition-all bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200"
+                      >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                        </svg>
+                      </a>
+                    ` : ''}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Modal functions
+    function openModal(nama, kelas, tahun, embedUrl) {
+      const modal = document.getElementById('modal');
+      document.getElementById('modal-title').textContent = `Karya: ${nama}`;
+      document.getElementById('modal-info').textContent = `${kelas} • ${tahun}`;
+      document.getElementById('modal-iframe-container').innerHTML = `
+        <iframe src="${embedUrl}" class="w-full h-full border-0" loading="lazy"></iframe>
+      `;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    document.getElementById('close-modal').addEventListener('click', () => {
+      const modal = document.getElementById('modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      document.getElementById('modal-iframe-container').innerHTML = '';
+    });
+
+    document.getElementById('modal').addEventListener('click', (e) => {
+      if (e.target.id === 'modal') {
+        const modal = document.getElementById('modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.getElementById('modal-iframe-container').innerHTML = '';
+      }
+    });
+
+    // Config change handler
+    async function onConfigChange(cfg) {
+      const galleryTitle = document.getElementById('gallery-title');
+      const subtitleText = document.getElementById('subtitle-text');
+      
+      if (galleryTitle) {
+        galleryTitle.textContent = cfg.gallery_title || defaultConfig.gallery_title;
+      }
+      if (subtitleText) {
+        subtitleText.textContent = cfg.subtitle_text || defaultConfig.subtitle_text;
+      }
+    }
+
+    // Initialize Element SDK
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (cfg) => ({
+          recolorables: [
+            {
+              get: () => cfg.primary_color || defaultConfig.primary_color,
+              set: (value) => {
+                cfg.primary_color = value;
+                window.elementSdk.setConfig({ primary_color: value });
+              }
+            },
+            {
+              get: () => cfg.secondary_color || defaultConfig.secondary_color,
+              set: (value) => {
+                cfg.secondary_color = value;
+                window.elementSdk.setConfig({ secondary_color: value });
+              }
+            },
+            {
+              get: () => cfg.background_color || defaultConfig.background_color,
+              set: (value) => {
+                cfg.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => cfg.surface_color || defaultConfig.surface_color,
+              set: (value) => {
+                cfg.surface_color = value;
+                window.elementSdk.setConfig({ surface_color: value });
+              }
+            },
+            {
+              get: () => cfg.text_color || defaultConfig.text_color,
+              set: (value) => {
+                cfg.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (cfg) => new Map([
+          ['gallery_title', cfg.gallery_title || defaultConfig.gallery_title],
+          ['subtitle_text', cfg.subtitle_text || defaultConfig.subtitle_text]
+        ])
+      });
+      config = window.elementSdk.config || defaultConfig;
+    }
+
+    // Initialize
+    fetchData();
+  </script>
+</body>
+</html>
