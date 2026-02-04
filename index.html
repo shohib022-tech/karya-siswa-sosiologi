@@ -1037,11 +1037,12 @@
     let leaderboardData = [];
 
     // Google Sheets URLs
-    const SHEET_ID = '1DZSdEe6mgS8jOc4Q_pxPIrIjuAKrdqb0sZL2eUJflWs';
-    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+    const KARYA_SHEET_ID = '1DZSdEe6mgS8jOc4Q_pxPIrIjuAKrdqb0sZL2eUJflWs';
+    const KARYA_SHEET_URL = `https://docs.google.com/spreadsheets/d/${KARYA_SHEET_ID}/gviz/tq?tqx=out:json`;
 
-    // Google Apps Script for ratings
-    const RATINGS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby9swSk3ZxEt1N-XT8Stf44cIL2e_0aXHy_wh5tLLlENi0LqiO_TGXXKE5HkR1dxiWfEg/exec';
+    // Google Sheets untuk rating (baru)
+    const RATING_SHEET_ID = '1wooXsc0aeC_ykVIWduaKwVmJDr5-iYoz1_6Lz-HHf-w';
+    const RATING_SHEET_URL = `https://docs.google.com/spreadsheets/d/${RATING_SHEET_ID}/gviz/tq?tqx=out:json`;
 
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
@@ -1123,10 +1124,10 @@
       }
       
       const data = {
+        timestamp: new Date().toISOString(),
         nama: nama,
         nilai: parseInt(nilai),
-        komentar: komentar,
-        timestamp: new Date().toISOString()
+        komentar: komentar
       };
       
       const statusElement = document.getElementById('status-penilaian');
@@ -1137,20 +1138,8 @@
         // Save to localStorage for demo
         saveRatingToLocalStorage(data);
         
-        // Also try to send to Google Sheets (optional)
-        try {
-          await fetch(RATINGS_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-          });
-        } catch (sheetError) {
-          console.log('Google Sheets submission optional, using localStorage');
-        }
-        
+        // Note: Untuk mengirim ke Google Sheets, Anda perlu setup Google Apps Script
+        // karena Google Sheets tidak menerima POST langsung dari frontend
         statusElement.textContent = '✅ Penilaian berhasil dikirim!';
         statusElement.className = 'text-center text-green-600';
         
@@ -1180,7 +1169,71 @@
       return rating;
     }
 
-    // Fetch ratings from localStorage
+    // Fetch ratings from Google Sheets
+    async function fetchRatingsFromGoogleSheets() {
+      try {
+        const response = await fetch(RATING_SHEET_URL);
+        const text = await response.text();
+        const json = JSON.parse(text.substring(47, text.length - 2));
+        
+        const rows = json.table.rows;
+        const ratings = [];
+        
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i].c;
+          if (row && row[1] && row[1].v) {
+            ratings.push({
+              timestamp: row[0] ? row[0].v : '',
+              nama: row[1] ? row[1].v : '',
+              nilai: row[2] ? parseInt(row[2].v) : 0,
+              komentar: row[3] ? row[3].v : ''
+            });
+          }
+        }
+        
+        allRatings = ratings;
+        
+        // Combine with localStorage ratings
+        const localRatings = JSON.parse(localStorage.getItem('library_ratings') || '[]');
+        allRatings = [...ratings, ...localRatings];
+        
+        // Calculate rating stats per student
+        ratingStats = {};
+        allRatings.forEach(rating => {
+          const nama = rating.nama;
+          if (!ratingStats[nama]) {
+            ratingStats[nama] = {
+              total: 0,
+              count: 0,
+              ratings: [],
+              comments: []
+            };
+          }
+          
+          ratingStats[nama].total += rating.nilai;
+          ratingStats[nama].count++;
+          ratingStats[nama].ratings.push(rating.nilai);
+          
+          if (rating.komentar && rating.komentar.trim()) {
+            ratingStats[nama].comments.push({
+              nilai: rating.nilai,
+              komentar: rating.komentar,
+              timestamp: rating.timestamp
+            });
+          }
+        });
+        
+        // Calculate leaderboard
+        calculateLeaderboard();
+        
+        return allRatings;
+      } catch (error) {
+        console.error('Error fetching ratings from Google Sheets:', error);
+        return fetchRatingsFromLocalStorage();
+      }
+    }
+
+    // Fetch ratings from localStorage (fallback)
     function fetchRatingsFromLocalStorage() {
       try {
         const ratings = JSON.parse(localStorage.getItem('library_ratings') || '[]');
@@ -1358,7 +1411,7 @@
     async function fetchData() {
       try {
         // Fetch karya data
-        const response = await fetch(SHEET_URL);
+        const response = await fetch(KARYA_SHEET_URL);
         const text = await response.text();
         const json = JSON.parse(text.substring(47, text.length - 2));
         
@@ -1381,8 +1434,8 @@
         allData = data;
         filteredData = [...data];
         
-        // Fetch ratings
-        fetchRatingsFromLocalStorage();
+        // Fetch ratings from Google Sheets
+        await fetchRatingsFromGoogleSheets();
         
         // Update UI
         generateFilters();
@@ -1399,7 +1452,7 @@
 
     // Fetch ratings data
     async function fetchRatings() {
-      fetchRatingsFromLocalStorage();
+      await fetchRatingsFromGoogleSheets();
       renderLeaderboard();
       renderGallery();
       updateStats();
@@ -1523,11 +1576,6 @@
         topRating = leaderboardData[0].avgRating;
       }
       document.getElementById('top-rating').textContent = topRating.toFixed(1);
-    }
-
-    // Get ratings for a specific student
-    function getRatingsForStudent(nama) {
-      return allRatings.filter(rating => rating.nama === nama);
     }
 
     // Get rating stats for a student
